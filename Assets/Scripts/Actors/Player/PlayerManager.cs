@@ -70,13 +70,11 @@ public class PlayerManager : MonoBehaviour
         if(x_input != 0){
             ICommand move = new CommandMove(actorScript.rb, x_input, actorScript.speed);
             invoker.Execute(move);
-            actorScript.animator.SetBool("Walk", true);
-            actorScript.animator.SetBool("Idle", false);
+            actorScript.animator.SetTrigger("Walk");
         } else if (IsGrounded()) {
             ICommand move = new CommandMove(actorScript.rb, 0, actorScript.speed);
             invoker.Execute(move);
-            actorScript.animator.SetBool("Walk", false);
-            actorScript.animator.SetBool("Idle", true);
+            actorScript.animator.SetTrigger("Idle");
         }
     }
     private void Flip(){
