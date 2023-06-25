@@ -4,24 +4,33 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-   [SerializeField] private Player actorScript; 
+    [Header("Actor References")]
+    [SerializeField] public Rigidbody2D rb;
+    [SerializeField] public GameObject bullet;
+    [SerializeField] public Transform bulletSpawn;
+    [SerializeField] public BoxCollider2D boxCollider;
+    [SerializeField] public LayerMask worldLayer;
+    [SerializeField] public Animator animator;
    private Invoker invoker;
    private float x_input;
    private bool isFacingRight = true;
 
    private bool isDashing = false;
-
    private float coyoteTimeCounter;
    private float jumpBufferCounter;
 
     void Start(){
-        invoker = new Invoker();   
+        invoker = new Invoker();
+        Player.SetAttack();
+        Player.SetDefense();
+        Player.SetHealth();
     }
 
     void Update() {
+        Debug.Log(Player.health);
 
         if(Input.GetKeyDown(KeyCode.Z)){
-            ICommand shoot = new CommandShoot(actorScript.bullet, actorScript.bulletSpawn, isFacingRight);
+            ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight);
             invoker.Execute(shoot);
         }
 
@@ -32,25 +41,25 @@ public class PlayerManager : MonoBehaviour
         x_input = Input.GetAxisRaw("Horizontal");
 
         if(IsGrounded()){
-            coyoteTimeCounter = actorScript.coyoteTime;
+            coyoteTimeCounter = Player.coyoteTime;
         } else {
             coyoteTimeCounter -= Time.deltaTime;
         }
 
         if(Input.GetKeyDown(KeyCode.Space)){
-            jumpBufferCounter = actorScript.jumpBufferTime;
+            jumpBufferCounter = Player.jumpBufferTime;
         } else {
             jumpBufferCounter -= Time.deltaTime;
         }
 
         if(coyoteTimeCounter > 0f && jumpBufferCounter > 0f){
-            ICommand jump = new CommandJump(actorScript.rb, actorScript.jumpForce);
+            ICommand jump = new CommandJump(rb, Player.jumpForce);
             invoker.Execute(jump);
             jumpBufferCounter = 0f;
         }
 
-        if(Input.GetKeyUp(KeyCode.Space) && actorScript.rb.velocity.y > 0f){
-            ICommand jump = new CommandJump(actorScript.rb, actorScript.rb.velocity.y * 0.5f);
+        if(Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0f){
+            ICommand jump = new CommandJump(rb, rb.velocity.y * 0.5f);
             invoker.Execute(jump);
             coyoteTimeCounter = 0f;
         }
@@ -67,14 +76,14 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
-        if(x_input != 0){
-            ICommand move = new CommandMove(actorScript.rb, x_input, actorScript.speed);
+        if(x_input != 0 && !Player.isDamaged){
+            ICommand move = new CommandMove(rb, x_input, Player.speed);
             invoker.Execute(move);
-            actorScript.animator.SetTrigger("Walk");
-        } else if (IsGrounded()) {
-            ICommand move = new CommandMove(actorScript.rb, 0, actorScript.speed);
+            animator.SetTrigger("Walk");
+        } else if (IsGrounded() && !Player.isDamaged) {
+            ICommand move = new CommandMove(rb, 0, Player.speed);
             invoker.Execute(move);
-            actorScript.animator.SetTrigger("Idle");
+            animator.SetTrigger("Idle");
         }
     }
     private void Flip(){
@@ -87,17 +96,17 @@ public class PlayerManager : MonoBehaviour
     }
 
     private bool IsGrounded(){
-        RaycastHit2D raycastHit = Physics2D.BoxCast(actorScript.boxCollider.bounds.center, actorScript.boxCollider.bounds.size, 0f, Vector2.down, 0.1f, actorScript.worldLayer);
+        RaycastHit2D raycastHit = Physics2D.BoxCast(boxCollider.bounds.center, boxCollider.bounds.size, 0f, Vector2.down, 0.1f, worldLayer);
         return raycastHit.collider != null;
     }
 
     private IEnumerator Dash(){
         isDashing = true;
-        float originalGravity = actorScript.rb.gravityScale;
-        actorScript.rb.gravityScale = 1f;
-        actorScript.rb.velocity = new Vector2(transform.localScale.x * actorScript.dashingPower, 0f);
-        yield return new WaitForSeconds(actorScript.dashingTime);
-        actorScript.rb.gravityScale = originalGravity;
+        float originalGravity = rb.gravityScale;
+        rb.gravityScale = 1f;
+        rb.velocity = new Vector2(transform.localScale.x * Player.dashingPower, 0f);
+        yield return new WaitForSeconds(Player.dashingTime);
+        rb.gravityScale = originalGravity;
         yield return new WaitUntil(IsGrounded);
         isDashing = false;
     }
