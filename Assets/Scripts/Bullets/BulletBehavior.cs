@@ -12,6 +12,9 @@ public class BulletBehavior : MonoBehaviour
     }
 
     void OnCollisionEnter2D(Collision2D collision){
+        if(collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
+            enemy.TakeDamage(bulletScript.damage);
+        }
         Destroy(this.gameObject);
     }
 }

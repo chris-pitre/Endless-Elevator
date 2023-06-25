@@ -27,10 +27,8 @@ public class PlayerManager : MonoBehaviour
     }
 
     void Update() {
-        Debug.Log(Player.health);
-
         if(Input.GetKeyDown(KeyCode.Z)){
-            ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight);
+            ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight, Player.attack);
             invoker.Execute(shoot);
         }
 
@@ -102,6 +100,7 @@ public class PlayerManager : MonoBehaviour
 
     private IEnumerator Dash(){
         isDashing = true;
+        Player.invincible = true;
         float originalGravity = rb.gravityScale;
         rb.gravityScale = 1f;
         rb.velocity = new Vector2(transform.localScale.x * Player.dashingPower, 0f);
@@ -109,5 +108,26 @@ public class PlayerManager : MonoBehaviour
         rb.gravityScale = originalGravity;
         yield return new WaitUntil(IsGrounded);
         isDashing = false;
+        Player.invincible = true;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision){
+        if(isDashing && collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
+            enemy.TakeDamage(Player.attack / 8);
+            enemy.isDashDamaged = true;
+            enemy.actorScript.animator.SetTrigger("Idle");
+            Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), true);
+            int direction = isFacingRight ? 1 : -1;
+            Vector2 damageDirection = new Vector2(direction * 20, 12);
+            collision.rigidbody.velocity = damageDirection;
+            StartCoroutine(EnemyDashDamagedFlag(enemy));
+        }
+    }
+
+    private IEnumerator EnemyDashDamagedFlag(EnemyChaserAI enemy){
+        yield return new WaitForSeconds(0.5f);
+        Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), false);
+        enemy.isDashDamaged = false;
+        enemy.actorScript.animator.SetTrigger("Walk");
     }
 }

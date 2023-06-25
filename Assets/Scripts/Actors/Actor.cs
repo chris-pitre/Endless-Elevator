@@ -5,7 +5,7 @@ using UnityEngine;
 public class Actor : MonoBehaviour
 {
     [Header("Universal Actor Settings")]
-    public int health;
+    public int maxHealth;
     public int speed;
     public int jumpForce;
     public int attack;
