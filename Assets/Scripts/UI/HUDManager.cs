@@ -9,7 +9,9 @@ public class HUDManager : MonoBehaviour
     [SerializeField] GameObject tens;
     [SerializeField] GameObject hundreds;
     [SerializeField] Slider healthSlider;
+    [SerializeField] Image pause;
     private static HUDManager _instance;
+    public static bool isPaused = false;
 
     public static HUDManager Instance{ get { return _instance;} }
 
@@ -22,6 +24,14 @@ public class HUDManager : MonoBehaviour
 
         SetMaxHealth();
         SetHealth(Player.max_health);
+    }
+
+    private void Update(){
+        if(Input.GetKeyDown(KeyCode.Escape)){
+            isPaused = !isPaused;
+            pause.enabled = !pause.enabled;
+            Time.timeScale = isPaused ? 0f : 1f;
+        }
     }
 
     public void UpdateLevel(int level){

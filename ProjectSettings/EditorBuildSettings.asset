@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 64ae17d2d1d271a49afc216e429064a7
+  - enabled: 1
     path: Assets/Scenes/HUD.unity
     guid: 0a59da78f50152449985fda0baee2b06
   - enabled: 1
@@ -17,4 +20,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/TheMarioCloudLevel.unity
     guid: d439bdfc5032e1443bda5e521883afab
+  - enabled: 1
+    path: Assets/Scenes/OfficeHours.unity
+    guid: 8a26850b957de68c8b98d0bf98966d17
   m_configObjects: {}

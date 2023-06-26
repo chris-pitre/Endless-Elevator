@@ -128,16 +128,6 @@ public class EnemyChaserAI : MonoBehaviour
             player.rb.velocity = damageDirection;
             StartCoroutine(PlayerDamagedFlag(collision));
         }
-        // if(isDashing && collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
-        //     enemy.TakeDamage(Player.attack / 8);
-        //     enemy.intangible = true;
-        //     enemy.actorScript.animator.SetTrigger("Idle");
-        //     Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), true);
-        //     int direction = isFacingRight ? 1 : -1;
-        //     Vector2 damageDirection = new Vector2(direction * 20, 12);
-        //     collision.GetComponent<Rigidbody2D>().velocity = damageDirection;
-        //     StartCoroutine(EnemyDashDamagedFlag(enemy));
-        // }
     }
 
     private IEnumerator PlayerDamagedFlag(Collider2D collision){

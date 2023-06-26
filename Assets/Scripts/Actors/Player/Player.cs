@@ -35,5 +35,9 @@ public static class Player
         }
         health -= real_damage;
         HUDManager.Instance.SetHealth(health);
+
+        if(health <= 0){
+            GameManager.Instance.MainMenu();
+        }
     }
 }

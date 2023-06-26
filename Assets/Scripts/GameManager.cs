@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     public int currentFloor = 0;
     public bool completedLevel = false;
     public int currentLevel;
-    public int maxLevels = 4;
+    private int maxLevels;
     private static GameManager _instance;
     public static GameManager Instance{ get { return _instance;} }
 
@@ -22,7 +22,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start(){
-        currentLevel = Random.Range(2, maxLevels);
+        currentLevel = GetRandomLevelIndex(1);
+        maxLevels = SceneManager.sceneCountInBuildSettings;
         SceneManager.LoadSceneAsync(currentLevel, LoadSceneMode.Additive);
     }
 
@@ -41,6 +42,9 @@ public class GameManager : MonoBehaviour
             if(GameObject.FindGameObjectWithTag("Elevator").TryGetComponent<Animator>(out Animator anim)){
                 anim.SetTrigger("Open");
             }
+            if(GameObject.FindGameObjectWithTag("Arrow").TryGetComponent<SpriteRenderer>(out SpriteRenderer arrow)){
+                arrow.enabled = true;
+            }
             completedLevel = true;
         }
     }
@@ -49,12 +53,27 @@ public class GameManager : MonoBehaviour
         if(GameObject.FindGameObjectWithTag("Elevator").TryGetComponent<Animator>(out Animator anim)){
             anim.SetTrigger("Close");
         }
+        if(GameObject.FindGameObjectWithTag("Arrow").TryGetComponent<SpriteRenderer>(out SpriteRenderer arrow)){
+                arrow.enabled = false;
+            }
         currentFloor++;
         HUDManager.Instance.UpdateLevel(currentFloor);
         completedLevel = false;
-        int randomLevel = Random.Range(1, maxLevels);
+        int randomLevel = GetRandomLevelIndex(currentLevel);
         SceneManager.UnloadSceneAsync(currentLevel);
         SceneManager.LoadSceneAsync(randomLevel, LoadSceneMode.Additive);
         currentLevel = randomLevel;
+    }
+
+    private int GetRandomLevelIndex(int currentLevel){
+        int randomLevel;
+        do{
+            randomLevel = Random.Range(2, maxLevels);
+        } while(randomLevel == currentLevel);
+        return randomLevel;
+    }
+
+    public void MainMenu(){
+        SceneManager.LoadScene(0);
     }
 }
