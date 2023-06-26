@@ -31,7 +31,7 @@ public class EnemyChaserAI : MonoBehaviour
     private Vector2 currentVelocity;
     private Vector2 direction; 
     private int health;
-    [HideInInspector] public bool isDashDamaged = false;
+    [HideInInspector] public bool intangible = false;
     public void Start(){
         invoker = new Invoker();
         InvokeRepeating("UpdatePath", 0f, pathUpdateSeconds);
@@ -52,7 +52,7 @@ public class EnemyChaserAI : MonoBehaviour
     }
 
     private void PathFollow(){
-        if(isDashDamaged){
+        if(intangible){
             return;
         }
 
@@ -121,19 +121,22 @@ public class EnemyChaserAI : MonoBehaviour
             Player.TakeDamage(actorScript.attack);
             Player.isDamaged = true;
             Player.invincible = true;
-            Physics2D.IgnoreLayerCollision(6, 9, true);
+            collision.gameObject.GetComponent<PlayerManager>().DamageColor();
+            intangible = true;
             Vector2 damageDirection = new Vector2(direction.x * 10, 12);
+            actorScript.rb.velocity = new Vector2(-direction.x * 10, 12);
             collision.rigidbody.velocity = damageDirection;
-            StartCoroutine(PlayerDamagedFlag());
+            StartCoroutine(PlayerDamagedFlag(collision));
         }
     }
 
-    private IEnumerator PlayerDamagedFlag(){
+    private IEnumerator PlayerDamagedFlag(Collision2D collision){
         yield return new WaitForSeconds(0.5f);
         Player.isDamaged = false;
+        intangible = false;
         yield return new WaitForSeconds(1.5f);
-        Physics2D.IgnoreLayerCollision(6, 9, false);
         Player.invincible = false;
+        collision.gameObject.GetComponent<PlayerManager>().DamageColor();
     }
 
     public void TakeDamage(int damage){

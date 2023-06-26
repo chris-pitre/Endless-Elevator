@@ -11,6 +11,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] public BoxCollider2D boxCollider;
     [SerializeField] public LayerMask worldLayer;
     [SerializeField] public Animator animator;
+    [SerializeField] public SpriteRenderer sprite;
    private Invoker invoker;
    private float x_input;
    private bool isFacingRight = true;
@@ -27,6 +28,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     void Update() {
+        Debug.Log(Player.health);
         if(Input.GetKeyDown(KeyCode.Z)){
             ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight, Player.attack);
             invoker.Execute(shoot);
@@ -108,13 +110,13 @@ public class PlayerManager : MonoBehaviour
         rb.gravityScale = originalGravity;
         yield return new WaitUntil(IsGrounded);
         isDashing = false;
-        Player.invincible = true;
+        Player.invincible = false;
     }
 
     private void OnCollisionEnter2D(Collision2D collision){
         if(isDashing && collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
             enemy.TakeDamage(Player.attack / 8);
-            enemy.isDashDamaged = true;
+            enemy.intangible = true;
             enemy.actorScript.animator.SetTrigger("Idle");
             Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), true);
             int direction = isFacingRight ? 1 : -1;
@@ -127,7 +129,15 @@ public class PlayerManager : MonoBehaviour
     private IEnumerator EnemyDashDamagedFlag(EnemyChaserAI enemy){
         yield return new WaitForSeconds(0.5f);
         Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), false);
-        enemy.isDashDamaged = false;
+        enemy.intangible = false;
         enemy.actorScript.animator.SetTrigger("Walk");
+    }
+
+    public void DamageColor(){
+        if(Player.invincible){
+            sprite.color = Color.red;
+        } else {
+            sprite.color = Color.white;
+        }
     }
 }

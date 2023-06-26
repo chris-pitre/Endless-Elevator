@@ -1,7 +1,7 @@
 public static class Player
 {
     //Default Universal Actor Settings
-    public static int d_health = 100;
+    public static int max_health = 100;
     public static int d_attack = 5;
     public static int d_defense = 5;
     public static int speed = 12; //does not change through gameplay
@@ -18,7 +18,7 @@ public static class Player
     public static bool invincible = false;
 
     public static void SetHealth(){
-        health = d_health;
+        health = max_health;
     }
     public static void SetAttack(){
         attack = d_attack;
@@ -34,5 +34,6 @@ public static class Player
             real_damage = damage * damage / defense;
         }
         health -= real_damage;
+        HUDManager.Instance.SetHealth(health);
     }
 }

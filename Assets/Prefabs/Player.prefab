@@ -348,6 +348,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   animator: {fileID: 8990255822739144442}
+  sprite: {fileID: 8990255822739144324}
 --- !u!1 &8990255823410361558
 GameObject:
   m_ObjectHideFlags: 0
