@@ -22,7 +22,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void Start(){
-        currentLevel = Random.Range(1, maxLevels);
+        currentLevel = Random.Range(2, maxLevels);
         SceneManager.LoadSceneAsync(currentLevel, LoadSceneMode.Additive);
     }
 
