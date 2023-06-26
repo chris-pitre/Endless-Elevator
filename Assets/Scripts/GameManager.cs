@@ -6,9 +6,9 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     private int numberOfEnemies = 0;
-    public int currentFloor = 1;
+    public int currentFloor = 0;
     public bool completedLevel = false;
-    public int currentLevel = 2;
+    public int currentLevel;
     public int maxLevels = 4;
     private static GameManager _instance;
     public static GameManager Instance{ get { return _instance;} }
@@ -18,8 +18,12 @@ public class GameManager : MonoBehaviour
             Destroy(this.gameObject);
         } else {
             _instance = this;
-        }
-        HUDManager.Instance.UpdateLevel(currentFloor);
+        }        
+    }
+
+    private void Start(){
+        currentLevel = Random.Range(1, maxLevels);
+        SceneManager.LoadSceneAsync(currentLevel, LoadSceneMode.Additive);
     }
 
     public void EnemyBirth(){
