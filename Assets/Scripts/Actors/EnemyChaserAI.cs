@@ -121,7 +121,6 @@ public class EnemyChaserAI : MonoBehaviour
             Player.TakeDamage(actorScript.attack);
             Player.isDamaged = true;
             Player.invincible = true;
-            collision.gameObject.GetComponent<PlayerManager>().DamageColor();
             intangible = true;
             Vector2 damageDirection = new Vector2(direction.x * 10, 12);
             actorScript.rb.velocity = new Vector2(-direction.x * 10, 12);
@@ -136,7 +135,6 @@ public class EnemyChaserAI : MonoBehaviour
         intangible = false;
         yield return new WaitForSeconds(1.5f);
         Player.invincible = false;
-        collision.gameObject.GetComponent<PlayerManager>().DamageColor();
     }
 
     public void TakeDamage(int damage){
@@ -148,6 +146,7 @@ public class EnemyChaserAI : MonoBehaviour
         }
         health -= real_damage;
         if(health <= 0){
+            GameManager.Instance.EnemyDeath();
             Destroy(this.gameObject);
         }
     }

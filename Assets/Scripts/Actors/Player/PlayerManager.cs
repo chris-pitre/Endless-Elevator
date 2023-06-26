@@ -17,6 +17,7 @@ public class PlayerManager : MonoBehaviour
    private bool isFacingRight = true;
 
    private bool isDashing = false;
+   private bool canExit = false;
    private float coyoteTimeCounter;
    private float jumpBufferCounter;
 
@@ -28,10 +29,17 @@ public class PlayerManager : MonoBehaviour
     }
 
     void Update() {
-        Debug.Log(Player.health);
+        DamageColor();
+        Debug.Log("Can Exit: " + canExit+", Level Complete: "+GameManager.Instance.completedLevel);
+
         if(Input.GetKeyDown(KeyCode.Z)){
             ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight, Player.attack);
             invoker.Execute(shoot);
+        }
+        
+        if(Input.GetKeyDown(KeyCode.UpArrow) && canExit){
+            canExit = false;
+            Debug.Log("leaving level");
         }
 
         if(isDashing){
@@ -123,6 +131,17 @@ public class PlayerManager : MonoBehaviour
             Vector2 damageDirection = new Vector2(direction * 20, 12);
             collision.rigidbody.velocity = damageDirection;
             StartCoroutine(EnemyDashDamagedFlag(enemy));
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if(GameManager.Instance.completedLevel && collision.gameObject.tag == "Elevator"){
+            canExit = true;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision) {
+        if(GameManager.Instance.completedLevel && collision.gameObject.tag == "Elevator"){
+            canExit = false;
         }
     }
 

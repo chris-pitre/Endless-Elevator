@@ -20,13 +20,11 @@ public class HUDManager : MonoBehaviour
             _instance = this;
         }
 
-        UpdateLevel();
         SetMaxHealth();
         SetHealth(Player.max_health);
     }
 
-    public void UpdateLevel(){
-        int level = 253;
+    public void UpdateLevel(int level){
         int ones_place = level % 10;
         int tens_place = (level % 100 - ones_place) / 10;
         int hundreds_place = (level - tens_place - ones_place) / 100;
