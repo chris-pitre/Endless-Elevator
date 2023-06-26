@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
+    path: Assets/Scenes/HUD.unity
+    guid: 0a59da78f50152449985fda0baee2b06
+  - enabled: 1
+    path: Assets/Scenes/Panopticon.unity
+    guid: 1ffab102598898d498eac9d80ab351e0
+  - enabled: 1
+    path: Assets/Scenes/ThePit.unity
+    guid: f0be38c53fbf23e4fa0d972a0794494d
+  - enabled: 1
+    path: Assets/Scenes/TheMarioCloudLevel.unity
+    guid: d439bdfc5032e1443bda5e521883afab
   m_configObjects: {}

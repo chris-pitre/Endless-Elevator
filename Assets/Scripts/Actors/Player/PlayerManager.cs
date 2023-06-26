@@ -20,17 +20,32 @@ public class PlayerManager : MonoBehaviour
    private bool canExit = false;
    private float coyoteTimeCounter;
    private float jumpBufferCounter;
+   private float isDamagedFailsafe = 3.0f;
+   private float isDamagedFailsafeCounter;
 
     void Start(){
         invoker = new Invoker();
         Player.SetAttack();
         Player.SetDefense();
         Player.SetHealth();
+        HUDManager.Instance.SetHealth(Player.health);
     }
 
     void Update() {
         DamageColor();
         Debug.Log("Can Exit: " + canExit+", Level Complete: "+GameManager.Instance.completedLevel);
+
+        if(!Player.isDamaged){
+            isDamagedFailsafeCounter = isDamagedFailsafe;
+        } else {
+            isDamagedFailsafe -= Time.deltaTime;
+        }
+
+        if(isDamagedFailsafe < 0f){
+            Player.isDamaged = false;
+            isDashing = false;
+            Player.invincible = false;
+        }
 
         if(Input.GetKeyDown(KeyCode.Z)){
             ICommand shoot = new CommandShoot(bullet, bulletSpawn, isFacingRight, Player.attack);
@@ -40,6 +55,7 @@ public class PlayerManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.UpArrow) && canExit){
             canExit = false;
             Debug.Log("leaving level");
+            GameManager.Instance.ChangeLevel();
         }
 
         if(isDashing){
@@ -111,7 +127,7 @@ public class PlayerManager : MonoBehaviour
     private IEnumerator Dash(){
         isDashing = true;
         Player.invincible = true;
-        float originalGravity = rb.gravityScale;
+        float originalGravity = 4f;
         rb.gravityScale = 1f;
         rb.velocity = new Vector2(transform.localScale.x * Player.dashingPower, 0f);
         yield return new WaitForSeconds(Player.dashingTime);
@@ -121,7 +137,11 @@ public class PlayerManager : MonoBehaviour
         Player.invincible = false;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision){
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if(GameManager.Instance.completedLevel && collision.gameObject.tag == "Elevator"){
+            canExit = true;
+        }
+        
         if(isDashing && collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
             enemy.TakeDamage(Player.attack / 8);
             enemy.intangible = true;
@@ -129,14 +149,8 @@ public class PlayerManager : MonoBehaviour
             Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), true);
             int direction = isFacingRight ? 1 : -1;
             Vector2 damageDirection = new Vector2(direction * 20, 12);
-            collision.rigidbody.velocity = damageDirection;
+            collision.GetComponent<Rigidbody2D>().velocity = damageDirection;
             StartCoroutine(EnemyDashDamagedFlag(enemy));
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision) {
-        if(GameManager.Instance.completedLevel && collision.gameObject.tag == "Elevator"){
-            canExit = true;
         }
     }
     private void OnTriggerExit2D(Collider2D collision) {

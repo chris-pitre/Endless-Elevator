@@ -33,6 +33,7 @@ public class EnemyChaserAI : MonoBehaviour
     private int health;
     [HideInInspector] public bool intangible = false;
     public void Start(){
+        GameManager.Instance.EnemyBirth();
         invoker = new Invoker();
         InvokeRepeating("UpdatePath", 0f, pathUpdateSeconds);
         health = actorScript.maxHealth;
@@ -116,20 +117,30 @@ public class EnemyChaserAI : MonoBehaviour
         return raycastHit.collider != null;
     }
 
-    private void OnCollisionEnter2D(Collision2D collision) {
-        if(collision.gameObject.tag == "Player" && !Player.invincible){
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if(collision.gameObject.TryGetComponent<PlayerManager>(out PlayerManager player) && !Player.invincible){
             Player.TakeDamage(actorScript.attack);
             Player.isDamaged = true;
             Player.invincible = true;
             intangible = true;
             Vector2 damageDirection = new Vector2(direction.x * 10, 12);
             actorScript.rb.velocity = new Vector2(-direction.x * 10, 12);
-            collision.rigidbody.velocity = damageDirection;
+            player.rb.velocity = damageDirection;
             StartCoroutine(PlayerDamagedFlag(collision));
         }
+        // if(isDashing && collision.gameObject.TryGetComponent<EnemyChaserAI>(out EnemyChaserAI enemy)){
+        //     enemy.TakeDamage(Player.attack / 8);
+        //     enemy.intangible = true;
+        //     enemy.actorScript.animator.SetTrigger("Idle");
+        //     Physics2D.IgnoreCollision(boxCollider, enemy.GetComponent<Collider2D>(), true);
+        //     int direction = isFacingRight ? 1 : -1;
+        //     Vector2 damageDirection = new Vector2(direction * 20, 12);
+        //     collision.GetComponent<Rigidbody2D>().velocity = damageDirection;
+        //     StartCoroutine(EnemyDashDamagedFlag(enemy));
+        // }
     }
 
-    private IEnumerator PlayerDamagedFlag(Collision2D collision){
+    private IEnumerator PlayerDamagedFlag(Collider2D collision){
         yield return new WaitForSeconds(0.5f);
         Player.isDamaged = false;
         intangible = false;
